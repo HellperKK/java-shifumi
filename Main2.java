@@ -2,83 +2,123 @@ import java.util.Scanner;
 import java.util.Random;
 import java.util.HashMap;
 
-abstract class ResultBis {
+abstract class Result {
     abstract int points();
 }
 
-class TieBis extends ResultBis {
-    public TieBis() {}
+class Tie extends Result {
+    public Tie() {}
     public int points() {
         return 0;
     }
+
+    public String toString() {
+        return "Tie";
+    }
 }
 
-class WinBis extends ResultBis {
-    public WinBis() {}
+class Win extends Result {
+    public Win() {}
     public int points() {
         return 1;
     }
-}
 
-class LossBis extends ResultBis {
-    public LossBis() {}
-    public int points() {
-        return -1;
+    public String toString() {
+        return "Win";
     }
 }
 
-abstract class HandTypeBis {
-    private HashMap<HandTypeBis, ResultBis> res;
-    public ResultBis activate(HandTypeBis other) {
+class Loss extends Result {
+    public Loss() {}
+    public int points() {
+        return -1;
+    }
+
+    public String toString() {
+        return "Loss";
+    }
+}
+
+abstract class HandType {
+    public static HashMap<HandType, Result> res;
+    public static void init() {}
+
+    public Result activate(HandType other) {
+        return res.get(other);
+    }
+
+    public boolean equals(Object other) {
+        return this.getClass().isInstance(other);
+    }
+
+    public int hashCode() {
+        return 31 * 17 * this.getClass().getName().hashCode();
+    }
+}
+
+class HandRock extends HandType {
+    public static HashMap<HandType, Result> res;
+    public static void init() {
+        res = new HashMap<HandType, Result>();
+        res.put(new HandRock(), new Tie());
+        res.put(new HandPaper(), new Loss());
+        res.put(new HandCisor(), new Win());
+    }
+
+    public Result activate(HandType other) {
         return res.get(other);
     }
 }
 
-class HandRockBis extends HandTypeBis {
-    private HashMap<HandTypeBis, ResultBis> res;
-    public HandRockBis() {
-        res = new HashMap<HandTypeBis, ResultBis>();
-        res.put(new HandRockBis(), new TieBis());
-        res.put(new HandPaperBis(), new LossBis());
-        res.put(new HandCisorBis(), new WinBis());
+class HandPaper extends HandType {
+    public static HashMap<HandType, Result> res;
+    public static void init() {
+        res = new HashMap<HandType, Result>();
+        res.put(new HandRock(), new Win());
+        res.put(new HandPaper(), new Tie());
+        res.put(new HandCisor(), new Loss());
+    }
+
+    public Result activate(HandType other) {
+        return res.get(other);
     }
 }
 
-class HandPaperBis extends HandTypeBis {
-    private HashMap<HandTypeBis, ResultBis> res;
-    public HandPaperBis() {
-        res = new HashMap<HandTypeBis, ResultBis>();
-        res.put(new HandRockBis(), new WinBis());
-        res.put(new HandPaperBis(), new TieBis());
-        res.put(new HandCisorBis(), new LossBis());
+class HandCisor extends HandType {
+    public static HashMap<HandType, Result> res;
+    public static void init() {
+        res = new HashMap<HandType, Result>();
+        res.put(new HandRock(), new Loss());
+        res.put(new HandPaper(), new Win());
+        res.put(new HandCisor(), new Tie());
     }
-}
 
-class HandCisorBis extends HandTypeBis {
-    private HashMap<HandTypeBis, ResultBis> res;
-    public HandCisorBis() {
-        res = new HashMap<HandTypeBis, ResultBis>();
-        res.put(new HandRockBis(), new LossBis());
-        res.put(new HandPaperBis(), new WinBis());
-        res.put(new HandCisorBis(), new TieBis());
+    public Result activate(HandType other) {
+        return res.get(other);
     }
 }
 
 class Main2 {
+    public static HandType[] hands = {new HandRock(), new HandPaper(), new HandCisor()};
+    public static Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
-        System.out.println("Lancement de partie");
+        HandRock.init();
+        HandPaper.init();
+        HandCisor.init();
+
+        System.out.println("Game start");
         game(0);
     }
 
     public static void game(int score) {
         try {
             System.out.println("Score is " + score);
-            HandType[] hands = {new HandRock(), new HandPaper(), new HandCisor()};
-            Scanner sc = new Scanner(System.in);
-            System.out.print("Choose (Rock, Paper; Scisors) ");
+            System.out.print("Choose (0 => Rock, 1 => Paper, 2 => Scisors) ");
             HandType player = hands[Integer.parseInt(sc.nextLine())];
             HandType other = hands[new Random().nextInt(3)];
             Result res = player.activate(other);
+            System.out.println(res);
             game(score + res.points());
         }
         catch(Exception e){

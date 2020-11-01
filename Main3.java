@@ -1,3 +1,7 @@
+/**
+ * Not functionnal code
+ */
+
 import java.util.Scanner;
 import java.util.Random;
 
@@ -39,67 +43,50 @@ class Loss extends Result {
 }
 
 abstract class HandType {
-    abstract public Result activate(HandType other);
-    abstract public Result withPaper();
-    abstract public Result withCisors();
-    abstract public Result withRock();
-}
-
-class HandRock extends HandType {
-    public Result activate(HandType other) {
-        return other.withRock();
-    }
-
-    public Result withPaper() {
-        return new Loss();
-    }
-
-    public Result withCisors() {
+    public static Result activate(HandRock hr, HandCisor hc) {
         return new Win();
     }
 
-    public Result withRock() {
+    public static Result activate(HandRock hr, HandPaper hc) {
+        return new Loss();
+    }
+
+    public static Result activate(HandCisor hr, HandRock hc) {
+        return new Loss();
+    }
+
+    public static Result activate(HandCisor hr, HandPaper hc) {
+        return new Win();
+    }
+
+    public static Result activate(HandPaper hr, HandRock hc) {
+        return new Win();
+    }
+
+    public static Result activate(HandPaper hr, HandCisor hc) {
+        return new Loss();
+    }
+
+    public static Result activate(HandRock ht, HandRock ht2) {
+        return new Tie();
+    }
+
+    public static Result activate(HandPaper ht, HandPaper ht2) {
+        return new Tie();
+    }
+
+    public static Result activate(HandCisor ht, HandCisor ht2) {
         return new Tie();
     }
 }
 
-class HandPaper extends HandType {
-    public Result activate(HandType other) {
-        return other.withPaper();
-    }
+class HandRock extends HandType {}
 
-    public Result withPaper() {
-        return new Tie();
-    }
+class HandPaper extends HandType {}
 
-    public Result withCisors() {
-        return new Loss();
-    }
+class HandCisor extends HandType {}
 
-    public Result withRock() {
-        return new Win();
-    }
-}
-
-class HandCisor extends HandType {
-    public Result activate(HandType other) {
-        return other.withCisors();
-    }
-
-    public Result withPaper() {
-        return new Win();
-    }
-
-    public Result withCisors() {
-        return new Tie();
-    }
-
-    public Result withRock() {
-        return new Loss();
-    }
-}
-
-class Main {
+class Main3 {
     public static HandType[] hands = {new HandRock(), new HandPaper(), new HandCisor()};
     public static Scanner sc = new Scanner(System.in);
 
@@ -114,7 +101,7 @@ class Main {
             System.out.print("Choose (0 => Rock, 1 => Paper, 2 => Scisors) ");
             HandType player = hands[Integer.parseInt(sc.nextLine())];
             HandType other = hands[new Random().nextInt(3)];
-            Result res = player.activate(other);
+            Result res = HandType.activate(player.getClass().cast(player), other.getClass().cast(other));
             System.out.println(res);
             game(score + res.points());
         }
